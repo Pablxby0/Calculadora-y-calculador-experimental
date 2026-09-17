@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OmniCalc Suite - Calculadora, Conversores & Generador</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            theme: {
+              50: 'var(--color-50)',
+              100: 'var(--color-100)',
+              500: 'var(--color-500)',
+              600: 'var(--color-600)',
+              700: 'var(--color-700)',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+    :root {
+      --color-50: #f0fdf4;
+      --color-100: #dcfce7;
+      --color-500: #22c55e;
+      --color-600: #16a34a;
+      --color-700: #15803d;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .font-mono {
+      font-family: 'Fira Code', monospace;
+    }
+
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+    .dark ::-webkit-scrollbar-thumb { background: #334155; }
+  </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col transition-colors duration-200">
+
+  <!-- Header / Navbar -->
+  <header class="sticky top-0 z-40 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 py-3">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <!-- Botón de Menú de 3 líneas al LADO IZQUIERDO -->
+        <button id="btnOpenMenu" class="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition" title="Herramientas & Ajustes">
+          <i data-lucide="menu" class="w-6 h-6"></i>
+        </button>
+
+        <div class="w-10 h-10 rounded-xl bg-theme-500/10 text-theme-600 dark:text-theme-500 flex items-center justify-center font-bold text-xl border border-theme-500/20">
+          <i data-lucide="calculator" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <h1 class="font-extrabold text-lg leading-tight tracking-tight text-slate-900 dark:text-white">Omni<span class="text-theme-500">Calc</span></h1>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Suite Matemática & Conversión</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button id="themeToggleBtn" class="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+          <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
+          <i data-lucide="moon" class="w-5 h-5 block dark:hidden"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Sidebar Overlay / Customization & Navigation Menu -->
+  <aside id="sideDrawer" class="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm hidden flex justify-start">
+    <div class="bg-white dark:bg-slate-900 h-full w-80 max-w-[85vw] p-6 shadow-2xl border-r border-slate-200 dark:border-slate-800 flex flex-col justify-between overflow-y-auto">
+      <div class="space-y-6">
+        <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-4">
+          <div class="flex items-center gap-2 font-bold text-slate-900 dark:text-white">
+            <i data-lucide="wrench" class="w-5 h-5 text-theme-500"></i>
+            <span>HERRAMIENTAS</span>
+          </div>
+          <button id="btnCloseMenu" class="p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <!-- Módulos de la Aplicación -->
+        <div class="space-y-1">
+          <span class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Módulos</span>
+          <button data-tab="calc" class="drawer-tab-btn active w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-semibold text-sm transition text-left bg-theme-50 dark:bg-theme-500/10 text-theme-700 dark:text-theme-500 border border-theme-200 dark:border-theme-500/20">
+            <i data-lucide="calculator" class="w-4 h-4"></i>
+            <span>Calculadora Precisa</span>
+          </button>
+
+          <button data-tab="converters" class="drawer-tab-btn w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-semibold text-sm transition text-left text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">
+            <i data-lucide="arrow-left-right" class="w-4 h-4"></i>
+            <span>Conversores</span>
+          </button>
+
+          <button data-tab="generator" class="drawer-tab-btn w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-semibold text-sm transition text-left text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">
+            <i data-lucide="dices" class="w-4 h-4"></i>
+            <span>Generador de Problemas</span>
+          </button>
+
+          <button data-tab="history" class="drawer-tab-btn w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-semibold text-sm transition text-left text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">
+            <i data-lucide="history" class="w-4 h-4"></i>
+            <span>Historial</span>
+          </button>
+        </div>
+
+        <hr class="border-slate-200 dark:border-slate-800">
+
+        <!-- Selector de Color Temático -->
+        <div class="space-y-3">
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+            Color Temático de Acento
+          </label>
+          <div class="grid grid-cols-5 gap-2" id="colorPalette">
+            <button data-color="emerald" class="w-10 h-10 rounded-xl bg-emerald-500 hover:scale-105 transition flex items-center justify-center text-white ring-2 ring-emerald-500 ring-offset-2 dark:ring-offset-slate-900"></button>
+            <button data-color="blue" class="w-10 h-10 rounded-xl bg-blue-500 hover:scale-105 transition flex items-center justify-center text-white"></button>
+            <button data-color="purple" class="w-10 h-10 rounded-xl bg-purple-500 hover:scale-105 transition flex items-center justify-center text-white"></button>
+            <button data-color="rose" class="w-10 h-10 rounded-xl bg-rose-500 hover:scale-105 transition flex items-center justify-center text-white"></button>
+            <button data-color="amber" class="w-10 h-10 rounded-xl bg-amber-500 hover:scale-105 transition flex items-center justify-center text-white"></button>
+          </div>
+        </div>
+      </div>
+
+      <div class="pt-6 border-t border-slate-200 dark:border-slate-800 text-center text-xs text-slate-400">
+        OmniCalc Suite
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Container -->
+  <div class="max-w-7xl mx-auto w-full flex-1 p-4 md:p-6">
+    <main class="space-y-6">
+
+      <!-- MÓDULO 1: CALCULADORA DE ALTA PRECISIÓN -->
+      <section id="tab-calc" class="tab-panel space-y-4">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 md:p-6 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-2 flex items-center gap-2">
+            <i data-lucide="cpu" class="text-theme-500"></i> Calculadora sin Límite de Números
+          </h2>
+          <p class="text-sm text-slate-500 dark:text-slate-400 mb-6">Suma, resta, multiplica, divide con precisión exacta, calcula raíces, potencias y factoriales.</p>
+
+          <div class="space-y-4">
+            <div>
+              <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Número A (o número base)</label>
+              <textarea id="calcNumA" rows="2" placeholder="Ejemplo: 99999999999999999999999999" class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm font-mono focus:outline-none focus:border-theme-500 transition break-all"></textarea>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Operación / Categoría</label>
+                <select id="calcOperator" class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm font-medium focus:outline-none focus:border-theme-500">
+                  <option value="+">Suma (+)</option>
+                  <option value="-">Resta (-)</option>
+                  <option value="*">Multiplicación (×)</option>
+                  <option value="/">División Precise (/)</option>
+                  <option value="pow">Potencia (^)</option>
+                  <option value="root">Raíz Cuadrada (√)</option>
+                  <option value="factorial">Factorial (!)</option>
+                </select>
+              </div>
+
+              <div id="numBContainer">
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Número B (Secundario)</label>
+                <textarea id="calcNumB" rows="1" placeholder="Ejemplo: 123456789" class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm font-mono focus:outline-none focus:border-theme-500 transition break-all"></textarea>
+              </div>
+            </div>
+
+            <button id="btnExecuteCalc" class="w-full py-3 bg-theme-600 hover:bg-theme-700 text-white font-bold text-sm rounded-xl transition flex items-center justify-center gap-2 shadow-sm">
+              <i data-lucide="calculator" class="w-5 h-5"></i> Calcular Resultado Exacto
+            </button>
+          </div>
+        </div>
+
+        <!-- Panel de Resultado -->
+        <div id="calcResultCard" class="hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 md:p-6 shadow-sm space-y-4">
+          <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-3">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Resultado de la Operación</span>
+            <button class="copy-btn px-3 py-1.5 text-xs font-medium bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition flex items-center gap-1.5" data-target="calcOutput">
+              <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copiar
+            </button>
+          </div>
+
+          <div id="calcOutput" class="p-4 bg-slate-950 text-theme-500 font-mono text-base md:text-lg rounded-xl break-all max-h-60 overflow-y-auto"></div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3 pt-2 text-xs">
+            <div class="p-3 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800">
+              <span class="text-slate-400 block font-semibold">Cantidad de Dígitos:</span>
+              <span id="metricDigits" class="font-bold text-slate-800 dark:text-slate-200 text-sm">0</span>
+            </div>
+            <div class="p-3 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800">
+              <span class="text-slate-400 block font-semibold">Tipo / Paridad:</span>
+              <span id="metricParity" class="font-bold text-slate-800 dark:text-slate-200 text-sm">-</span>
+            </div>
+            <div class="p-3 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800">
+              <span class="text-slate-400 block font-semibold">Análisis:</span>
+              <span id="metricPrime" class="font-bold text-slate-800 dark:text-slate-200 text-sm">-</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- MÓDULO 2: CONVERSORES DE UNIDADES (9 CATEGORÍAS) -->
+      <section id="tab-converters" class="tab-panel hidden space-y-6">
+        <div>
+          <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-1 flex items-center gap-2">
+            <i data-lucide="arrow-left-right" class="text-theme-500"></i> Suite Multi-Conversor
+          </h2>
+          <p class="text-sm text-slate-500 dark:text-slate-400">Selecciona una categoría para realizar conversiones instantáneas.</p>
+        </div>
+
+        <!-- Grid de Categorías -->
+        <div class="grid grid-cols-3 gap-3 md:gap-4">
+          <button data-cat="currency" class="converter-cat-btn active bg-white dark:bg-slate-900 hover:border-theme-500 border-2 border-theme-500 p-4 rounded-2xl flex flex-col items-center justify-center gap-2 transition text-center group shadow-sm">
+            <div class="w-12 h-12 rounded-xl bg-theme-500/10 text-theme-600 dark:text-theme-500 flex items-center justify-center font-bold text-xl">
+              ¥
+            </div>
+            <span class="text-xs md:text-sm font-semibold text-slate-800 dark:text-slate-200">Moneda</span>
+          </button>
+
+          <button data-cat="length" class="converter-cat-btn bg-white dark:bg-slate-900 hover:border-theme-500 border-2 border-slate-200 dark:border-slate-800 p-4 rounded-2xl flex flex-col items-center justify-center gap-2 transition text-center group shadow-sm">
+            <div class="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center font-bold text-xl">
+              <i data-lucide="ruler" class="w-6 h-6"></i>
+            </div>
+            <span class="text-xs md:text-sm font-semibold text-slate-800 dark:text-slate-200">Longitud</span>
+          </button>
+
+          <button data-cat="area" class="converter-cat-btn bg-white dark:bg-slate-900 hover:border-theme-500 border-2 border-slate-200 dark:border-slate-800 p-4 rounded-2xl flex flex-col items-center justify-center gap-2 transition text-center group shadow-sm">
+            <div class="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center font-bold text-xl">
+              <i data-lucide="square" class="w-6 h-6"></i>
+            </div>
+            <span class="text-xs md:text-sm font-semibold text-slate-800 dark:text-slate-200">Área</span>
+          </button>
+
+          <button data-cat="volume" class="converter-cat-btn bg-white dark:bg-slate-900 hover:border-theme-500 border-2 border-slate-200 dark:border-slate-800 p-4 rounded-2xl flex flex-col items-center justify-center gap-2 transition text-center group shadow-sm">
+            <div class="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center font-bold text-xl">
+              <i data-lucide="box" class="w-6 h-6"></i>
+            </div>
+            <span class="text-xs md:text-sm font-semibold text-slate-800 dark:text-slate-200">Volumen</span>
+          </button>
+
+          <button data-cat="weight" class="converter-cat-btn bg-white dark:bg-slate-900 hover:border-theme-500 border-2 border-slate-200 dark:border-slate-800 p-4 rounded-2xl flex flex-col items-center justify-center gap-2 transition text-center group shadow-sm">
+            <div class="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center font-bold text-xl">
+              <i data-lucide="weight" class="w-6 h-6"></i>
+            </div>
+            <span class="text-xs md:text-sm font-semibold text-slate-800 dark:text-slate-200">Peso</span>
+          </button>
+
+          <button data-cat="temperature" class="converter-cat-btn bg-white dark:bg-slate-900 hover:border-theme-500 border-2 border-slate-200 dark:border-slate-800 p-4 rounded-2xl flex flex-col items-center justify-center gap-2 transition text-center group shadow-sm">
+            <div class="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center font-bold text-xl">
+              <i data-lucide="thermometer" class="w-6 h-6"></i>
+            </div>
+            <span class="text-xs md:text-sm font-semibold text-slate-800 dark:text-slate-200">Temperatura</span>
+          </button>
+
+          <button data-cat="speed" class="converter-cat-btn bg-white dark:bg-slate-900 hover:border-theme-500 border-2 border-slate-200 dark:border-slate-800 p-4 rounded-2xl flex flex-col items-center justify-center gap-2 transition text-center group shadow-sm">
+            <div class="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center font-bold text-xl">
+              <i data-lucide="gauge" class="w-6 h-6"></i>
+            </div>
+            <span class="text-xs md:text-sm font-semibold text-slate-800 dark:text-slate-200">Velocidad</span>
+          </button>
+
+          <button data-cat="pressure" class="converter-cat-btn bg-white dark:bg-slate-900 hover:border-theme-500 border-2 border-slate-200 dark:border-slate-800 p-4 rounded-2xl flex flex-col items-center justify-center gap-2 transition text-center group shadow-sm">
+            <div class="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center font-bold text-xl">
+              <i data-lucide="timer" class="w-6 h-6"></i>
+            </div>
+            <span class="text-xs md:text-sm font-semibold text-slate-800 dark:text-slate-200">Presión</span>
+          </button>
+
+          <button data-cat="energy" class="converter-cat-btn bg-white dark:bg-slate-900 hover:border-theme-500 border-2 border-slate-200 dark:border-slate-800 p-4 rounded-2xl flex flex-col items-center justify-center gap-2 transition text-center group shadow-sm">
+            <div class="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center font-bold text-xl">
+              <i data-lucide="zap" class="w-6 h-6"></i>
+            </div>
+            <span class="text-xs md:text-sm font-semibold text-slate-800 dark:text-slate-200">Energía</span>
+          </button>
+        </div>
+
+        <!-- Área Interactiva de Conversión -->
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 md:p-6 shadow-sm space-y-4">
+          <h3 id="converterTitle" class="text-lg font-bold text-slate-900 dark:text-white uppercase tracking-wider text-xs text-theme-500">Conversor de Moneda</h3>
+          
+          <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-center">
+            <div class="md:col-span-2 space-y-2">
+              <label class="block text-xs font-semibold uppercase text-slate-400">De:</label>
+              <input type="number" id="converterInput" value="1" class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-lg font-mono focus:outline-none focus:border-theme-500">
+              <select id="converterUnitFrom" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm font-medium focus:outline-none focus:border-theme-500">
+              </select>
+            </div>
+
+            <div class="flex justify-center">
+              <button id="btnSwapUnits" class="p-3 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-theme-500 hover:text-white transition shadow-sm">
+                <i data-lucide="arrow-left-right" class="w-5 h-5"></i>
+              </button>
+            </div>
+
+            <div class="md:col-span-2 space-y-2">
+              <label class="block text-xs font-semibold uppercase text-slate-400">A:</label>
+              <div id="converterResultOutput" class="w-full px-4 py-3 bg-slate-950 text-theme-500 border border-slate-800 rounded-xl text-lg font-mono break-all min-h-[52px] flex items-center">
+                0
+              </div>
+              <select id="converterUnitTo" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm font-medium focus:outline-none focus:border-theme-500">
+              </select>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- MÓDULO 3: GENERADOR DE PROBLEMAS Y ECUACIONES -->
+      <section id="tab-generator" class="tab-panel hidden space-y-4">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 md:p-6 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-2 flex items-center gap-2">
+            <i data-lucide="dices" class="text-theme-500"></i> Generador de Ejercicios Avanzado
+          </h2>
+          <p class="text-sm text-slate-500 dark:text-slate-400 mb-6">Genera expresiones matemáticas complejas con raíces, potencias, Pi y operaciones combinadas.</p>
+
+          <div class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Modo de Generación</label>
+                <select id="genMode" class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm font-medium focus:outline-none focus:border-theme-500">
+                  <option value="target">Ecuación para un Resultado Específico</option>
+                  <option value="random">Problema Aleatorio Combinado (√, ^, π, +, -)</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Dificultad</label>
+                <select id="genDifficulty" class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm font-medium focus:outline-none focus:border-theme-500">
+                  <option value="easy">Básica (Operaciones simples)</option>
+                  <option value="medium">Avanzada (Raíces, Potencias)</option>
+                  <option value="hard">Extrema (Expresiones Olímpicas con π y √)</option>
+                </select>
+              </div>
+            </div>
+
+            <div id="targetNumberContainer">
+              <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Resultado Objetivo Deseado</label>
+              <input type="text" id="genTargetInput" value="100" placeholder="Ejemplo: 42 o 3.14" class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm font-mono focus:outline-none focus:border-theme-500">
+            </div>
+
+            <button id="btnGenerateMath" class="w-full py-3 bg-theme-600 hover:bg-theme-700 text-white font-bold text-sm rounded-xl transition flex items-center justify-center gap-2">
+              <i data-lucide="sparkles" class="w-4 h-4"></i> Generar Problema
+            </button>
+          </div>
+        </div>
+
+        <!-- Resultado Generado -->
+        <div id="genResultCard" class="hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 md:p-6 shadow-sm space-y-4">
+          <div class="flex justify-between items-center">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Problema Generado</span>
+            <button class="copy-btn px-3 py-1.5 text-xs font-medium bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition flex items-center gap-1.5" data-target="genProblemOutput">
+              <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copiar
+            </button>
+          </div>
+
+          <div id="genProblemOutput" class="p-4 bg-slate-950 text-theme-500 font-mono text-lg rounded-xl break-all"></div>
+          
+          <div id="genSolutionContainer" class="p-4 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 text-sm">
+            <span class="text-xs text-slate-400 font-semibold block uppercase">Solución / Resultado Exacto:</span>
+            <span id="genSolutionOutput" class="font-mono font-bold text-slate-900 dark:text-white"></span>
+          </div>
+        </div>
+      </section>
+
+      <!-- MÓDULO 4: HISTORIAL DE OPERACIONES -->
+      <section id="tab-history" class="tab-panel hidden space-y-4">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 md:p-6 shadow-sm">
+          <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <i data-lucide="history" class="text-theme-500"></i> Registro de Acciones e Historial
+            </h2>
+            <button id="btnClearHistory" class="px-3 py-1.5 text-xs font-medium bg-rose-500/10 text-rose-600 dark:text-rose-400 hover:bg-rose-500/20 rounded-lg transition">
+              Limpiar Historial
+            </button>
+          </div>
+
+          <div id="historyList" class="space-y-2">
+            <p class="text-sm text-slate-400 italic text-center py-6">Aún no se han registrado operaciones en esta sesión.</p>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- JavaScript Logic -->
+  <script>
+    lucide.createIcons();
+
+    // Theme Palette Settings
+    const themePalettes = {
+      emerald: { 50: '#f0fdf4', 100: '#dcfce7', 500: '#22c55e', 600: '#16a34a', 700: '#15803d' },
+      blue:    { 50: '#eff6ff', 100: '#dbeafe', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8' },
+      purple:  { 50: '#faf5ff', 100: '#f3e8ff', 500: '#a855f7', 600: '#9333ea', 700: '#7e22ce' },
+      rose:    { 50: '#fff1f2', 100: '#ffe4e6', 500: '#f43f5e', 600: '#e11d48', 700: '#be123c' },
+      amber:   { 50: '#fffbeb', 100: '#fef3c7', 500: '#f59e0b', 600: '#d97706', 700: '#b45309' }
+    };
+
+    document.querySelectorAll('#colorPalette button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const colorName = btn.dataset.color;
+        const palette = themePalettes[colorName];
+        if(!palette) return;
+
+        document.documentElement.style.setProperty('--color-50', palette[50]);
+        document.documentElement.style.setProperty('--color-100', palette[100]);
+        document.documentElement.style.setProperty('--color-500', palette[500]);
+        document.documentElement.style.setProperty('--color-600', palette[600]);
+        document.documentElement.style.setProperty('--color-700', palette[700]);
+
+        document.querySelectorAll('#colorPalette button').forEach(b => b.className = b.className.replace(/ring-2.*/, ''));
+        btn.className += ` ring-2 ring-${colorName}-500 ring-offset-2 dark:ring-offset-slate-900`;
+      });
+    });
+
+    // Dark Mode Toggle
+    document.getElementById('themeToggleBtn').addEventListener('click', () => {
+      document.documentElement.classList.toggle('dark');
+    });
+
+    // Drawer Menu Logic
+    const sideDrawer = document.getElementById('sideDrawer');
+    document.getElementById('btnOpenMenu').addEventListener('click', () => sideDrawer.classList.remove('hidden'));
+    document.getElementById('btnCloseMenu').addEventListener('click', () => sideDrawer.classList.add('hidden'));
+
+    // Module Switching via Drawer
+    const drawerTabBtns = document.querySelectorAll('.drawer-tab-btn');
+    const tabPanels = document.querySelectorAll('.tab-panel');
+
+    drawerTabBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const target = btn.dataset.tab;
+
+        drawerTabBtns.forEach(b => {
+          if(b.dataset.tab === target) {
+            b.classList.add('text-theme-700', 'dark:text-theme-500', 'bg-theme-50', 'dark:bg-theme-500/10');
+            b.classList.remove('text-slate-600', 'dark:text-slate-400');
+          } else {
+            b.classList.remove('text-theme-700', 'dark:text-theme-500', 'bg-theme-50', 'dark:bg-theme-500/10');
+            b.classList.add('text-slate-600', 'dark:text-slate-400');
+          }
+        });
+
+        tabPanels.forEach(panel => {
+          if (panel.id === `tab-${target}`) {
+            panel.classList.remove('hidden');
+          } else {
+            panel.classList.add('hidden');
+          }
+        });
+
+        // Close drawer after selection
+        sideDrawer.classList.add('hidden');
+      });
+    });
+
+    // Calculator Option Toggle
+    document.getElementById('calcOperator').addEventListener('change', (e) => {
+      const numBContainer = document.getElementById('numBContainer');
+      if (['factorial', 'root'].includes(e.target.value)) {
+        numBContainer.classList.add('hidden');
+      } else {
+        numBContainer.classList.remove('hidden');
+      }
+    });
+
+    // History System
+    let history = [];
+    function addHistory(opStr, resStr) {
+      const time = new Date().toLocaleTimeString();
+      history.unshift({ op: opStr, res: resStr, time });
+      renderHistory();
+    }
+
+    function renderHistory() {
+      const list = document.getElementById('historyList');
+      if (history.length === 0) {
+        list.innerHTML = `<p class="text-sm text-slate-400 italic text-center py-6">Aún no se han registrado operaciones en esta sesión.</p>`;
+        return;
+      }
+
+      list.innerHTML = history.map(item => `
+        <div class="p-3 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 flex justify-between items-center text-xs md:text-sm">
+          <div>
+            <span class="font-mono text-slate-500 block">${item.op} =</span>
+            <span class="font-mono font-bold text-theme-600 dark:text-theme-500 break-all">${item.res}</span>
+          </div>
+          <span class="text-[10px] text-slate-400 ml-2">${item.time}</span>
+        </div>
+      `).join('');
+    }
+
+    document.getElementById('btnClearHistory').addEventListener('click', () => {
+      history = [];
+      renderHistory();
+    });
+
+    // --- CALCULADORA AVANZADA ---
+    document.getElementById('btnExecuteCalc').addEventListener('click', () => {
+      const strA = document.getElementById('calcNumA').value.trim();
+      const op = document.getElementById('calcOperator').value;
+      const strB = document.getElementById('calcNumB').value.trim();
+
+      if (!strA) { alert('Ingresa el número principal.'); return; }
+
+      try {
+        let resStr = '';
+        let opDisplay = '';
+
+        if (op === 'factorial') {
+          const numA = BigInt(strA);
+          if (numA < 0n) throw new Error("El factorial exige números positivos.");
+          let fact = 1n;
+          for (let i = 2n; i <= numA; i++) fact *= i;
+          resStr = fact.toString();
+          opDisplay = `${numA}!`;
+        } else if (op === 'root') {
+          const numA = parseFloat(strA);
+          if (numA < 0) throw new Error("No existe raíz cuadrada real para números negativos.");
+          resStr = Math.sqrt(numA).toLocaleString('fullwide', { maximumFractionDigits: 15 });
+          opDisplay = `√(${strA})`;
+        } else if (op === '/') {
+          const numA = Number(strA);
+          const numB = Number(strB || 0);
+          if (numB === 0) throw new Error("División por cero no permitida.");
+          resStr = (numA / numB).toLocaleString('fullwide', { maximumFractionDigits: 15 });
+          opDisplay = `${strA} / ${strB}`;
+        } else {
+          const numA = BigInt(strA);
+          const numB = BigInt(strB || 0);
+          let result = 0n;
+
+          if (op === '+') { result = numA + numB; opDisplay = `${numA} + ${numB}`; }
+          else if (op === '-') { result = numA - numB; opDisplay = `${numA} - ${numB}`; }
+          else if (op === '*') { result = numA * numB; opDisplay = `${numA} × ${numB}`; }
+          else if (op === 'pow') { result = numA ** numB; opDisplay = `${numA}^${numB}`; }
+          resStr = result.toString();
+        }
+
+        document.getElementById('calcOutput').textContent = resStr;
+        document.getElementById('metricDigits').textContent = resStr.replace(/[\.,]/g, '').length;
+        const isDecimal = resStr.includes('.') || resStr.includes(',');
+        document.getElementById('metricParity').textContent = isDecimal ? 'Decimal / Real' : (BigInt(resStr) % 2n === 0n ? 'Entero Par' : 'Entero Impar');
+        document.getElementById('metricPrime').textContent = isDecimal ? 'Número Real' : 'Número Entero Evaluado';
+
+        document.getElementById('calcResultCard').classList.remove('hidden');
+        addHistory(opDisplay, resStr);
+
+      } catch (err) {
+        alert("Error en el cálculo: " + err.message);
+      }
+    });
+
+    // --- CONVERSORES (9 CATEGORÍAS) ---
+    const converterUnits = {
+      currency: {
+        title: "Conversor de Monedas",
+        units: { USD: 1, EUR: 0.92, GBP: 0.78, MXN: 17.1, COP: 3900, JPY: 155 },
+        labels: { USD: "Dólar Estadounidense (USD)", EUR: "Euro (EUR)", GBP: "Libra Esterlina (GBP)", MXN: "Peso Mexicano (MXN)", COP: "Peso Colombiano (COP)", JPY: "Yen Japonés (JPY)" }
+      },
+      length: {
+        title: "Conversor de Longitud",
+        units: { m: 1, km: 0.001, cm: 100, mm: 1000, inch: 39.3701, ft: 3.28084, yd: 1.09361, mi: 0.000621371 },
+        labels: { m: "Metros (m)", km: "Kilómetros (km)", cm: "Centímetros (cm)", mm: "Milímetros (mm)", inch: "Pulgadas (in)", ft: "Pies (ft)", yd: "Yardas (yd)", mi: "Millas (mi)" }
+      },
+      area: {
+        title: "Conversor de Área",
+        units: { m2: 1, km2: 0.000001, cm2: 10000, ha: 0.0001, acre: 0.000247105, ft2: 10.7639 },
+        labels: { m2: "Metros cuadrados (m²)", km2: "Kilómetros cuadrados (km²)", cm2: "Centímetros cuadrados (cm²)", ha: "Hectáreas (ha)", acre: "Acres", ft2: "Pies cuadrados (ft²)" }
+      },
+      volume: {
+        title: "Conversor de Volumen",
+        units: { l: 1, ml: 1000, m3: 0.001, gal: 0.264172, qt: 1.05669, pt: 2.11338 },
+        labels: { l: "Litros (L)", ml: "Mililitros (mL)", m3: "Metros cúbicos (m³)", gal: "Galones (gal)", qt: "Cuartos (qt)", pt: "Pintas (pt)" }
+      },
+      weight: {
+        title: "Conversor de Peso / Masa",
+        units: { kg: 1, g: 1000, mg: 1000000, lb: 2.20462, oz: 35.274, ton: 0.001 },
+        labels: { kg: "Kilogramos (kg)", g: "Gramos (g)", mg: "Miligramos (mg)", lb: "Libras (lb)", oz: "Onzas (oz)", ton: "Toneladas (t)" }
+      },
+      temperature: {
+        title: "Conversor de Temperatura",
+        custom: true,
+        units: { C: "Celsius (°C)", F: "Fahrenheit (°F)", K: "Kelvin (K)" }
+      },
+      speed: {
+        title: "Conversor de Velocidad",
+        units: { ms: 1, kmh: 3.6, mph: 2.23694, knot: 1.94384 },
+        labels: { ms: "Metros por segundo (m/s)", kmh: "Kilómetros por hora (km/h)", mph: "Millas por hora (mph)", knot: "Nudos (kt)" }
+      },
+      pressure: {
+        title: "Conversor de Presión",
+        units: { pa: 1, bar: 0.00001, psi: 0.000145038, atm: 0.00000986923 },
+        labels: { pa: "Pascal (Pa)", bar: "Bar", psi: "PSI (libras/in²)", atm: "Atmósferas (atm)" }
+      },
+      energy: {
+        title: "Conversor de Energía",
+        units: { j: 1, kj: 0.001, cal: 0.239006, kcal: 0.000239006, wh: 0.000277778, kwh: 0.000000277778 },
+        labels: { j: "Julios (J)", kj: "Kilojulios (kJ)", cal: "Calorías (cal)", kcal: "Kilocalorías (kcal)", wh: "Vatios-hora (Wh)", kwh: "Kilovatios-hora (kWh)" }
+      }
+    };
+
+    let activeCategory = 'currency';
+
+    function loadCategory(catKey) {
+      activeCategory = catKey;
+      const catData = converterUnits[catKey];
+      document.getElementById('converterTitle').textContent = catData.title;
+
+      const selectFrom = document.getElementById('converterUnitFrom');
+      const selectTo = document.getElementById('converterUnitTo');
+      selectFrom.innerHTML = '';
+      selectTo.innerHTML = '';
+
+      const keys = Object.keys(catData.units);
+      const labels = catData.labels || catData.units;
+
+      keys.forEach((key, index) => {
+        selectFrom.add(new Option(labels[key] || key, key));
+        selectTo.add(new Option(labels[key] || key, key));
+      });
+
+      if (keys.length > 1) selectTo.selectedIndex = 1;
+      calculateConversion();
+    }
+
+    function calculateConversion() {
+      const val = parseFloat(document.getElementById('converterInput').value) || 0;
+      const fromUnit = document.getElementById('converterUnitFrom').value;
+      const toUnit = document.getElementById('converterUnitTo').value;
+      const catData = converterUnits[activeCategory];
+      let result = 0;
+
+      if (catData.custom) {
+        // Conversión especial de Temperatura
+        let celsius = val;
+        if (fromUnit === 'F') celsius = (val - 32) * 5/9;
+        if (fromUnit === 'K') celsius = val - 273.15;
+
+        if (toUnit === 'C') result = celsius;
+        if (toUnit === 'F') result = (celsius * 9/5) + 32;
+        if (toUnit === 'K') result = celsius + 273.15;
+      } else {
+        const base = val / catData.units[fromUnit];
+        result = base * catData.units[toUnit];
+      }
+
+      document.getElementById('converterResultOutput').textContent = result.toLocaleString('fullwide', { maximumFractionDigits: 8 });
+    }
+
+    document.querySelectorAll('.converter-cat-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.converter-cat-btn').forEach(b => {
+          b.classList.remove('border-theme-500', 'active');
+          b.classList.add('border-slate-200', 'dark:border-slate-800');
+        });
+        btn.classList.add('border-theme-500', 'active');
+        btn.classList.remove('border-slate-200', 'dark:border-slate-800');
+        loadCategory(btn.dataset.cat);
+      });
+    });
+
+    document.getElementById('converterInput').addEventListener('input', calculateConversion);
+    document.getElementById('converterUnitFrom').addEventListener('change', calculateConversion);
+    document.getElementById('converterUnitTo').addEventListener('change', calculateConversion);
+    document.getElementById('btnSwapUnits').addEventListener('click', () => {
+      const selectFrom = document.getElementById('converterUnitFrom');
+      const selectTo = document.getElementById('converterUnitTo');
+      const temp = selectFrom.value;
+      selectFrom.value = selectTo.value;
+      selectTo.value = temp;
+      calculateConversion();
+    });
+
+    loadCategory('currency');
+
+    // --- GENERADOR DE PROBLEMAS ---
+    document.getElementById('btnGenerateMath').addEventListener('click', () => {
+      const mode = document.getElementById('genMode').value;
+      const diff = document.getElementById('genDifficulty').value;
+      const targetStr = document.getElementById('genTargetInput').value.trim();
+
+      let problem = '';
+      let solution = '';
+
+      if (mode === 'target') {
+        const target = parseFloat(targetStr) || 100;
+        if (diff === 'easy') {
+          const part1 = Math.floor(Math.random() * target);
+          problem = `Resuelve X: X + ${part1} = ${target}`;
+          solution = `X = ${target - part1}`;
+        } else if (diff === 'medium') {
+          problem = `Resuelve X: √(X) + 10 = ${target}`;
+          const val = Math.pow(target - 10, 2);
+          solution = `X = ${val}`;
+        } else {
+          problem = `Resuelve X: (X × π) / 2 = ${target}`;
+          solution = `X = ${(target * 2 / Math.PI).toFixed(4)}`;
+        }
+      } else {
+        if (diff === 'easy') {
+          const a = Math.floor(Math.random() * 50) + 1;
+          const b = Math.floor(Math.random() * 50) + 1;
+          problem = `Calcula: ${a} + ${b} × 2`;
+          solution = `${a + b * 2}`;
+        } else if (diff === 'medium') {
+          const a = Math.floor(Math.random() * 100) + 1;
+          problem = `Calcula: √(144) + 3^3 - ${a}`;
+          solution = `${12 + 27 - a}`;
+        } else {
+          problem = `Calcula exacto: √(625) × π + 5^2`;
+          solution = `${(25 * Math.PI + 25).toFixed(4)}`;
+        }
+      }
+
+      document.getElementById('genProblemOutput').textContent = problem;
+      document.getElementById('genSolutionOutput').textContent = solution;
+      document.getElementById('genResultCard').classList.remove('hidden');
+
+      addHistory(`Generador (${mode})`, `${problem} ➔ ${solution}`);
+    });
+
+    // Helper de Copia
+    document.querySelectorAll('.copy-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const targetId = btn.dataset.target;
+        const targetEl = document.getElementById(targetId);
+        if(!targetEl) return;
+
+        navigator.clipboard.writeText(targetEl.innerText).then(() => {
+          const orig = btn.innerHTML;
+          btn.innerHTML = `<i data-lucide="check" class="w-3.5 h-3.5 text-theme-500"></i> Copiado`;
+          lucide.createIcons();
+          setTimeout(() => { btn.innerHTML = orig; lucide.createIcons(); }, 2000);
+        });
+      });
+    });
+  </script>
+</body>
+</html>
